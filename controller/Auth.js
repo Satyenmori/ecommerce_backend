@@ -12,12 +12,14 @@ export const createUser = async (req, res) => {
 
 export const loginUser=async(req,res)=>{
   try {
-    const {email,password}=req.body
-    const emailExist=await User.findOne({email,password})
-    if(emailExist){
-      res.status(201).json("Login SuccsessFuly")
+    const user=await User.findOne({email: req.body.email}).exec();
+    console.log(user);
+    if(!user){
+      res.status(401).json({msg:"no found email"})
+    }else if(user.password===req.body.password){
+      res.status(200).json({id:user.id, email:user.email, name:user.name,addresses:user.addresses});
     }else{
-      res.status(401).json("email and password Not found")
+      res.status(401).json({ message: 'invalid credentials' });
     }
   } catch (error) {
     res.status(500).json(error)
